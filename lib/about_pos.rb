@@ -14,31 +14,32 @@ class About_Pos
 
         meta = Meta.new(:back)
         meta.value = v
-        meta.index = real_index
+        meta.real_index = real_index
+        meta.last_index = size - 1
         meta.i     = i
         meta.next  = nil
         meta.prev  = nil
         meta.fin
 
-        yield meta.value, meta.index, meta
+        yield meta.value, meta.real_index, meta
       }
     end
 
     def Forward arr
       size = arr.size
       arr.each_with_index { |v, i|
-
         real_index = i
 
         meta = Meta.new(:forward)
         meta.value = v
-        meta.index = real_index
+        meta.real_index = real_index
+        meta.last_index = size - 1
         meta.i     = i
         meta.next  = nil
         meta.prev  = nil
         meta.fin
 
-        yield meta.value, meta.index, meta
+        yield meta.value, meta.real_index, meta
       }
     end
 
@@ -50,16 +51,24 @@ class About_Pos
       @is_fin = false
       @data   = {}
       @dir    = dir
+      @real_index = nil
+      @last_index = nil
+      @value  = nil
+      @i      = nil
+
+      @next   = nil
+      @prev   = nil
     end
 
     [
       :real_index,
       :last_index,
-      :next_meta, :prev_meta,
-      :val, :index, :i, :next, :prev
+      :value, :i,
+      :next, :prev
     ].each { |v|
       eval %~
         def #{v}
+          raise "Value not set for: #{v}" if @#{v}.nil?
           @#{v}
         end
 
@@ -71,6 +80,24 @@ class About_Pos
       ~
     }
 
+    def next
+      @msg ||= if forward?
+                 "This is the first position."
+               else
+                 "This is the last position."
+               end
+      raise No_Next, @msg if !next?
+    end
+
+    def prev
+      @msg ||= if forward?
+                 "This is the first position."
+               else
+                 "This is the last position."
+               end
+      raise No_Prev, @msg if !prev?
+    end
+
     def dir
       @dir
     end
@@ -79,7 +106,7 @@ class About_Pos
       dir == :back
     end
 
-    def forward
+    def forward?
       dir == :forward
     end
 
