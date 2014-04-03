@@ -87,8 +87,9 @@ describe "Forward" do
         vals   = [:a, :b, :c]
         track  = []
         About_Pos.Forward([1,2,3,4]) do | v, i, m |
+          m[:test_val] = vals.shift
+
           if m.prev?
-            m[:test_val] = vals.shift
             track.push( m.prev[:test_val] )
           else
             track.push nil
