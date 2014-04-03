@@ -6,22 +6,31 @@ class About_Pos
 
   class << self
 
-    def Back arr
-      size = arr.size
-      arr_r = arr.reverse
-
-      arr.reverse.each_with_index { |v, i|
-        real_index = (size - 1) - i
-        meta = Meta.new(:back, real_index, i, arr)
-        yield meta.value, meta.real_index, meta
-      }
+    def Back arr, &blok
+      Move(:back, arr, &blok)
     end
 
-    def Forward arr
+    def Forward arr, &blok
+      Move(:forward, arr, &blok)
+    end
+
+    private
+    def Move dir, arr
       size = arr.size
-      arr.each_with_index { |v, i|
-        meta = Meta.new(:forward, i, i, arr)
+
+      if dir == :forward
+        real_index = 0
+        seq = arr
+      else
+        real_index = (size - 1) - 0
+        seq = arr.reverse
+      end
+
+      meta = Meta.new(dir, real_index, 0, arr)
+
+      seq.each_with_index { |v, i|
         yield meta.value, meta.real_index, meta
+        (meta = meta.next) if meta.next?
       }
     end
 
@@ -29,7 +38,7 @@ class About_Pos
 
   class Meta
 
-    def initialize dir, real_index, i, arr
+    def initialize dir, real_index, i, arr, prev = nil
       @arr        = arr
       @data       = {}
       @dir        = dir
@@ -40,8 +49,7 @@ class About_Pos
       @i          = i
 
       @next = nil
-      @prev = nil
-
+      @prev = prev
     end
 
     [
@@ -68,9 +76,9 @@ class About_Pos
 
       @next ||= begin
                   if forward?
-                    Meta.new(dir, real_index + 1, self.i + 1, arr)
+                    Meta.new(dir, real_index + 1, self.i + 1, arr, self)
                   else
-                    Meta.new(dir, real_index - 1, self.i - 1, arr)
+                    Meta.new(dir, real_index - 1, self.i - 1, arr, self)
                   end
                 end
     end
@@ -118,11 +126,6 @@ class About_Pos
       else
         real_index != last_index
       end
-    end
-
-    def fin
-      @is_fin = true
-      self
     end
 
     def top?

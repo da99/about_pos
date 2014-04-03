@@ -81,6 +81,24 @@ describe "Forward" do
 
     end # === describe prev ===
 
+    describe "saving/reading data ([], []=)" do
+
+      it "saves a value to be used on .prev meta" do
+        vals   = [:a, :b, :c]
+        track  = []
+        About_Pos.Forward([1,2,3,4]) do | v, i, m |
+          if m.prev?
+            m[:test_val] = vals.shift
+            track.push( m.prev[:test_val] )
+          else
+            track.push nil
+          end
+        end
+        track.should == [nil,:a,:b,:c]
+      end
+
+    end # === describe []/[]= ===
+
   end # === describe Meta ===
 
 end # === describe about_pos ===
