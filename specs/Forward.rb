@@ -98,6 +98,18 @@ describe "Forward" do
         track.should == [nil,:a,:b,:c]
       end
 
+      it "saves a value to be used on .next meta" do
+        vals = [:d, :e, :f]
+        track = []
+        About_Pos.Forward([1,2,3,4]) do |v,i,m|
+          if m.next?
+            m.next[:test_val] = vals.shift
+          end
+          track.push m[:test_val]
+        end
+        track.should == [nil, :d, :e, :f]
+      end
+
     end # === describe []/[]= ===
 
   end # === describe Meta ===
