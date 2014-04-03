@@ -1,8 +1,8 @@
 
-describe "about_pos" do
+describe "About_Pos" do
 
-  it "runs" do
-    About_Pos.should.flunk "No tests written."
+  it "exists" do
+    About_Pos.to_s.should == "About_Pos"
   end
 
 end # === describe about_pos ===

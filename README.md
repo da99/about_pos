@@ -1,7 +1,7 @@
 
-# About_Pos
+# About\_Pos
 
-I have no idea.
+Loop through an array and keep track of previous, next item, current item, etc
 
 ## Installation
 

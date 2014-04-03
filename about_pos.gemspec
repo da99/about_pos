@@ -7,9 +7,13 @@ Gem::Specification.new do |spec|
   spec.version       = `cat VERSION`
   spec.authors       = ["da99"]
   spec.email         = ["i-hate-spam-1234567@mailinator.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
+  spec.summary       = %q{Provide more meta info while you  loop back/forth on your arrays.}
   spec.description   = %q{
-    TODO: Write a longer description. Optional.
+    Whenever I loop through an array, there are times I wish I could
+    know what comes before or after the item I am currently one.
+    Including prev/next index calculations.  This gem helps you with
+    that. However, it would be better for you to create your own
+    since you will probably not like my way of doing it.
   }
   spec.homepage      = "https://github.com/da99/about_pos"
   spec.license       = "MIT"
