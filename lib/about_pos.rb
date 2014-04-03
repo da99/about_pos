@@ -12,13 +12,7 @@ class About_Pos
 
         real_index = (size - 1) - i
 
-        meta = Meta.new(:back)
-        meta.value = v
-        meta.real_index = real_index
-        meta.last_index = size - 1
-        meta.i     = i
-        meta.next  = nil
-        meta.prev  = nil
+        meta = Meta.new(:back, real_index, i, arr)
         meta.fin
 
         yield meta.value, meta.real_index, meta
@@ -30,13 +24,7 @@ class About_Pos
       arr.each_with_index { |v, i|
         real_index = i
 
-        meta = Meta.new(:forward)
-        meta.value = v
-        meta.real_index = real_index
-        meta.last_index = size - 1
-        meta.i     = i
-        meta.next  = nil
-        meta.prev  = nil
+        meta = Meta.new(:forward, real_index, i, arr)
         meta.fin
 
         yield meta.value, meta.real_index, meta
@@ -47,17 +35,64 @@ class About_Pos
 
   class Meta
 
-    def initialize dir
+    class << self
+      def new *args
+        o = super(*args)
+        if o.invalid?
+          nil
+        else
+          o
+        end
+      end
+    end # === class self ===
+
+    def initialize dir, real_index, i, arr, move = nil
+      @invalid = false
+      @arr = arr
       @is_fin = false
       @data   = {}
       @dir    = dir
-      @real_index = nil
-      @last_index = nil
-      @value  = nil
-      @i      = nil
+      @last_index = arr.size - 1
+      @next = nil
+      @prev = nil
 
-      @next   = nil
-      @prev   = nil
+      case move
+
+      when :next
+        if forward?
+          if @last_index == real_index
+            invalid!
+            return nil
+          else
+            @real_index = real_index + 1
+            @value      = @arr[@real_index]
+            @i          = i + 1
+          end
+
+        else
+        end
+
+      when :prev
+        if forward?
+        else
+        end
+
+      else
+        @real_index = real_index
+        @value  = nil
+        @i      = i
+
+        @next   = Meta.new(@dir, @real_index, @i, arr, :next)
+        @prev   = Meta.new(@dir, @real_index, @i, arr, :prev)
+      end
+    end
+
+    def invalid?
+      @invalid
+    end
+
+    def invalid!
+      @invalid = true
     end
 
     [
@@ -87,6 +122,8 @@ class About_Pos
                  "This is the last position."
                end
       raise No_Next, @msg if !next?
+      raise "Value not set for: next" if @next.nil?
+      @next
     end
 
     def prev
@@ -96,6 +133,8 @@ class About_Pos
                  "This is the last position."
                end
       raise No_Prev, @msg if !prev?
+      raise "Value not set for: prev" if @prev.nil?
+      @prev
     end
 
     def dir

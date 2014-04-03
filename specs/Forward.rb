@@ -41,7 +41,7 @@ describe "Forward" do
 
     describe "next" do
 
-      it "contains a .value for next" do
+      it "contains .value for next" do
         track = []
         About_Pos.Forward([1,2,3,4]) do | v, i, m |
           track.push(m.next.value) if m.next?
