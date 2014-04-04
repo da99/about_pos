@@ -45,14 +45,27 @@ describe "Back" do
 
     describe "prev" do
 
-      it "has value of previous items" do
+      it "has value of previous item" do
         track = []
         About_Pos.Back([8,9,1,2]) do |v,i,m|
           track.push(m.prev? ? m.prev.value : nil)
         end
         track.should == [nil, 2, 1, 9]
       end
+
     end # === describe prev ===
+
+    describe "next" do
+
+      it "has value of next item" do
+        track = []
+        About_Pos.Back([1,2,3,4]) do |v,i,m|
+          track.push(m.next? ? m.next.value : nil)
+        end
+        track.should == [3, 2, 1, nil]
+      end
+
+    end # === describe next ===
 
   end # === describe Meta ===
 
