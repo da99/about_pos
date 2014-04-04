@@ -79,6 +79,16 @@ describe "Back" do
         track.should == [3, 2, 1, nil]
       end
 
+      it "saves data that is accesible in the next iteration" do
+        track = []
+        vals = [:a, :b, :c]
+        About_Pos.Back([1,2,3]) { | v, i, m |
+          (m.next[:test_val] = vals.shift) if m.next?
+          track.push(m[:test_val])
+        }
+        track.should == [nil, :a, :b]
+      end
+
     end # === describe next ===
 
   end # === describe Meta ===
