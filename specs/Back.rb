@@ -53,6 +53,20 @@ describe "Back" do
         track.should == [nil, 2, 1, 9]
       end
 
+      it "holds data from previous iterations" do
+        track = []
+        vals = [:a, :b, :c, :d]
+        About_Pos.Back([8,9,1,2]) do |v,i,m|
+          if m.prev?
+            track.push m.prev[:test_val]
+          else
+            track.push nil
+          end
+          m[:test_val] = vals.shift
+        end
+        track.should == [nil, :a, :b, :c]
+      end
+
     end # === describe prev ===
 
     describe "next" do
