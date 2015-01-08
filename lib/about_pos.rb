@@ -6,6 +6,10 @@ class About_Pos
 
   class << self
 
+    def Detect
+      self::Detect
+    end
+
     def Back arr, &blok
       Move(:back, arr, &blok)
     end
@@ -39,6 +43,26 @@ class About_Pos
     end
 
   end # === class self ===
+
+  class Detect
+
+    class << self
+
+      def Back arr
+        About_Pos.Back(arr) { |v,i,m|
+          break if yield(v,i,m)
+        }
+      end
+
+      def Forward arr
+        About_Pos.Forward(arr) { |v,i,m|
+          break if yield(v,i,m)
+        }
+      end
+
+    end # === class self
+
+  end # === class Detect
 
   class Meta
 
