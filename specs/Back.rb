@@ -91,6 +91,26 @@ describe "Back" do
 
     end # === describe next ===
 
+    describe :grab do
+
+      it "grabs the :next value" do
+        tracks = []
+        About_Pos.Back([1,2,3,4]) { |v,i,m|
+          tracks << m.grab
+        }
+        tracks.should == [3,1]
+      end # === it grabs the :next value
+
+      it "skips grabbed values" do
+        tracks = []
+        About_Pos.Back([1,2,3,4,5]) { |v,i,m|
+          tracks << m.grab if m.next?
+        }
+        tracks.should == [4,2]
+      end # === it skips grabbed values
+
+    end # === describe :grab
+
     describe ".top?" do
 
       it "returns true if at real first" do
