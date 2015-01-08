@@ -26,11 +26,15 @@ class About_Pos
         seq = arr.reverse
       end
 
-      meta = Meta.new(dir, real_index, 0, arr)
+      meta = Meta.new(dir, real_index, arr)
 
       seq.each_with_index { |v, i|
         yield meta.value, meta.real_index, meta
-        (meta = meta.next) if meta.next?
+        if meta.next?
+          meta = meta.next
+        else
+          break
+        end
       }
     end
 
@@ -38,25 +42,26 @@ class About_Pos
 
   class Meta
 
-    def initialize dir, real_index, i, arr, prev = nil
+    def initialize dir, real_index, arr, prev = nil
       @arr        = arr
       @data       = {}
       @dir        = dir
       @last_index = arr.size - 1
 
       @real_index = real_index
-      @value      = arr[real_index]
-      @i          = i
 
       @next = nil
       @prev = prev
     end
 
+    def value
+      arr[real_index]
+    end
+
     [
       :arr,
       :real_index,
-      :last_index,
-      :value, :i
+      :last_index
     ].each { |v|
       eval %~
         def #{v}
@@ -65,6 +70,16 @@ class About_Pos
         end
       ~
     }
+
+    def grab
+      raise No_Next, "No more values to grab" unless next?
+      if forward?
+        @real_index += 1
+      else
+        @real_index -= 1
+      end
+      value
+    end
 
     def next
       @msg ||= if forward?
@@ -76,9 +91,9 @@ class About_Pos
 
       @next ||= begin
                   if forward?
-                    Meta.new(dir, real_index + 1, self.i + 1, arr, self)
+                    Meta.new(dir, real_index + 1, arr, self)
                   else
-                    Meta.new(dir, real_index - 1, self.i - 1, arr, self)
+                    Meta.new(dir, real_index - 1, arr, self)
                   end
                 end
     end
@@ -93,9 +108,9 @@ class About_Pos
 
       @prev ||= begin
                   if forward?
-                    Meta.new(dir, real_index - 1, self.i - 1, arr)
+                    Meta.new(dir, real_index - 1, arr)
                   else
-                    Meta.new(dir, real_index + 1, self.i + 1, arr)
+                    Meta.new(dir, real_index + 1, arr)
                   end
                 end
     end
@@ -114,17 +129,17 @@ class About_Pos
 
     def next?
       if forward?
-        real_index != last_index
+        real_index < last_index
       else
-        real_index != 0
+        real_index > 0
       end
     end
 
     def prev?
       if forward?
-        real_index != 0
+        real_index > 0
       else
-        real_index != last_index
+        real_index < last_index
       end
     end
 

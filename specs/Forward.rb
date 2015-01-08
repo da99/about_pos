@@ -81,6 +81,36 @@ describe "Forward" do
 
     end # === describe prev ===
 
+    describe :grab do
+
+      it "takes the next value" do
+        tracks = []
+        About_Pos.Forward([1,2,3,4]) do |v,i,m|
+          tracks << m.grab
+        end
+        tracks.should == [2,4]
+      end # === it takes the next value
+
+      it "skips the value that was taken" do
+        tracks = []
+        About_Pos.Forward([1,2,3,4]) do |v,i,m|
+          tracks << v
+          m.grab
+        end
+        tracks.should == [1,3]
+      end # === it skips the value that was taken
+
+      it "raises an error if there aren't anymore values" do
+        lambda {
+          About_Pos.Forward([1,2,3,4]) do |v,i,m|
+            5.times { m.grab }
+          end
+        }.should.raise(About_Pos::No_Next).
+        message.should.match /No more values to grab/
+      end # === it raises an error if there aren't anymore values
+
+    end # === describe :grab
+
     describe "saving/reading data ([], []=)" do
 
       it "saves a value to be used on .prev meta" do
