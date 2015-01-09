@@ -5,7 +5,7 @@ describe :Detect do
 
     it "returns first value that is truthy" do
       tracks = []
-      result = About_Pos.Detect.Back([1,2,3,4]) do |v,i,m|
+      result = About_Pos.Back([1,2,3,4]).detect do |v,i,m|
         tracks << v
         v == 2
       end
@@ -18,7 +18,7 @@ describe :Detect do
 
     it "returns first value that is truthy" do
       tracks = []
-      result = About_Pos.Detect.Forward([1,2,3,4,5]) do |v,i,m|
+      result = About_Pos.Forward([1,2,3,4,5]).detect do |v,i,m|
         tracks << v
         v == 3
       end

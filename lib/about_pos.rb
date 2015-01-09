@@ -4,65 +4,54 @@ class About_Pos
   No_Next = Class.new(RuntimeError)
   No_Prev = Class.new(RuntimeError)
 
-  class << self
+  class Enum
 
-    def Detect
-      self::Detect
-    end
+    include Enumerable
 
-    def Back arr, &blok
-      Move(:back, arr, &blok)
-    end
-
-    def Forward arr, &blok
-      Move(:forward, arr, &blok)
-    end
-
-    private
-    def Move dir, arr
-      size = arr.size
-
+    def initialize dir, arr
+      @arr = arr
       if dir == :forward
-        real_index = 0
-        seq = arr
+        @real_index = 0
       else
-        real_index = (size - 1) - 0
-        seq = arr.reverse
+        @real_index = (@arr.size - 1) - 0
       end
 
-      meta = Meta.new(dir, real_index, arr)
+      @meta = Meta.new(dir, @real_index, arr)
+    end
 
-      seq.each_with_index { |v, i|
-        yield meta.value, meta.real_index, meta
-        if meta.next?
-          meta = meta.next
-        else
-          break
+    def each
+      return nil if @arr.empty?
+      has_next = false
+      begin
+        result = yield @meta.value, @meta.real_index, @meta
+        has_next = @meta.next?
+        if has_next
+          @meta.next!
         end
-      }
+      end while has_next
+    end
+
+  end # === class Enum
+
+  class << self
+
+    def Back arr
+      if block_given?
+        Back(arr).each { |v,i,m| yield v, i, m }
+      else
+        Enum.new(:back, arr)
+      end
+    end
+
+    def Forward arr
+      if block_given?
+        Forward(arr).each { |v,i,m| yield v, i, m }
+      else
+        Enum.new(:forward, arr)
+      end
     end
 
   end # === class self ===
-
-  class Detect
-
-    class << self
-
-      def Back arr
-        About_Pos.Back(arr) { |v,i,m|
-          break if yield(v,i,m)
-        }
-      end
-
-      def Forward arr
-        About_Pos.Forward(arr) { |v,i,m|
-          break if yield(v,i,m)
-        }
-      end
-
-    end # === class self
-
-  end # === class Detect
 
   class Meta
 
@@ -71,11 +60,32 @@ class About_Pos
       @data       = {}
       @dir        = dir
       @last_index = arr.size - 1
-
       @real_index = real_index
+      @prev       = prev
+    end
 
-      @next = nil
-      @prev = prev
+    def data
+      @data
+    end
+
+    def data= d
+      @data = d
+    end
+
+    def [] k
+      @data[@real_index] ||= {}
+      @data[@real_index][k]
+    end
+
+    def []= k, v
+      self[k]
+      @data[@real_index][k] = v
+    end
+
+    def dup
+      d = super
+      d.data= @data
+      d
     end
 
     def value
@@ -106,6 +116,18 @@ class About_Pos
     end
 
     def next
+      m = dup
+      m.next!
+      m
+    end
+
+    def prev
+      m = dup
+      m.prev!
+      m
+    end
+
+    def next!
       @msg ||= if forward?
                  "This is the last position."
                else
@@ -113,16 +135,16 @@ class About_Pos
                end
       raise No_Next, @msg if !next?
 
-      @next ||= begin
-                  if forward?
-                    Meta.new(dir, real_index + 1, arr, self)
-                  else
-                    Meta.new(dir, real_index - 1, arr, self)
-                  end
-                end
+      if forward?
+        @real_index = @real_index + 1
+      else
+        @real_index = @real_index - 1
+      end
+
+      value
     end
 
-    def prev
+    def prev!
       @msg ||= if forward?
                  "This is the first position."
                else
@@ -130,13 +152,13 @@ class About_Pos
                end
       raise No_Prev, @msg if !prev?
 
-      @prev ||= begin
-                  if forward?
-                    Meta.new(dir, real_index - 1, arr)
-                  else
-                    Meta.new(dir, real_index + 1, arr)
-                  end
-                end
+      if forward?
+        @real_index = real_index - 1
+      else
+        @real_index = real_index + 1
+      end
+
+      value
     end
 
     def dir
@@ -177,14 +199,6 @@ class About_Pos
 
     def bottom?
       real_index == last_index
-    end
-
-    def [] k
-      @data[k]
-    end
-
-    def []= k, v
-      @data[k] = v
     end
 
   end # === class Meta ===
