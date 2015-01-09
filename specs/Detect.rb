@@ -1,5 +1,5 @@
 
-describe :Detect do
+describe :detect do
 
   describe :Back do
 
