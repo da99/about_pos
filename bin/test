@@ -2,9 +2,9 @@
 # -*- bash -*-
 #
 #
+files="specs/$1.rb"
 set -u -e -o pipefail
 
-files="specs/$@.rb"
 if [[ -f "$files" ]]; then
   shift
 else
